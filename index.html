@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Larry the Spheroid Explains Everything</title>
+<style>
+  :root{
+    --bg:#fff5e6;          /* warm cream, deliberately NOT clinical blue */
+    --bg2:#ffe8c7;
+    --ink:#2a2118;
+    --ink-soft:#6b5d49;
+    --pop:#ff6b4a;         /* warm coral */
+    --pop2:#ffb13c;        /* marigold */
+    --teal:#1fb6a6;        /* friendly contrast */
+    --grape:#7c5cbf;
+    --card:#fffdf8;
+    --line:#e8d3b0;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{background:radial-gradient(circle at 50% 0%,var(--bg2),var(--bg));
+    color:var(--ink);font-family:'Inter','Segoe UI',system-ui,sans-serif;
+    line-height:1.55;display:flex;align-items:flex-start;justify-content:center;
+    padding:18px;min-height:100vh}
+  .app{width:100%;max-width:560px;margin:auto}
+
+  /* progress pips */
+  .pips{display:flex;gap:6px;justify-content:center;margin-bottom:16px}
+  .pip{width:26px;height:6px;border-radius:4px;background:var(--line);transition:.3s}
+  .pip.on{background:var(--pop)}
+  .pip.done{background:var(--pop2)}
+
+  .card{background:var(--card);border:2px solid var(--ink);border-radius:22px;
+    padding:26px 24px 22px;box-shadow:8px 8px 0 var(--ink);
+    animation:pop .35s cubic-bezier(.2,1.3,.4,1)}
+  @keyframes pop{from{transform:translateY(10px) scale(.98);opacity:0}to{transform:none;opacity:1}}
+
+  .stage{display:flex;justify-content:center;margin-bottom:10px}
+  svg.hero{width:170px;height:170px;overflow:visible}
+
+  /* classic 'HELLO my name is' conference sticker, pinned on the character */
+  .stage{position:relative}
+  .nametag{position:absolute;right:8px;bottom:-2px;width:118px;
+    background:#fff;border:2px solid #2a2118;border-radius:6px;
+    box-shadow:3px 3px 0 rgba(42,33,24,.25);transform:rotate(-7deg);
+    font-family:'Inter','Segoe UI',sans-serif;overflow:hidden}
+  .nametag .hello{background:#2f6fd6;color:#fff;font-size:.5rem;font-weight:800;
+    letter-spacing:.5px;text-transform:uppercase;text-align:center;padding:3px 0 4px}
+  .nametag .hello small{display:block;font-size:.42rem;font-weight:600;
+    letter-spacing:1px;opacity:.9;margin-bottom:1px}
+  .nametag .name{font-family:Georgia,serif;font-size:1.35rem;font-weight:700;
+    color:#2a2118;text-align:center;padding:5px 4px 7px;line-height:1}
+  @media(prefers-reduced-motion:reduce){.nametag{transform:rotate(-7deg)}}
+
+  .kicker{font-size:.72rem;font-weight:800;letter-spacing:1.5px;
+    text-transform:uppercase;color:var(--pop);text-align:center;margin:0 0 4px}
+  h2{font-family:Georgia,'Times New Roman',serif;font-size:1.5rem;
+    text-align:center;margin:0 0 12px;line-height:1.2}
+  .body{font-size:1.02rem;color:var(--ink);margin:0 auto;max-width:44ch;text-align:center}
+  .body b{background:linear-gradient(transparent 60%,#ffe08a 60%);padding:0 2px}
+
+  .realword{margin:16px auto 0;max-width:42ch;font-size:.8rem;color:var(--ink-soft);
+    background:#fbf2e2;border:1px dashed var(--line);border-radius:12px;
+    padding:9px 13px;text-align:center}
+  .realword b{color:var(--grape)}
+
+  .nav{display:flex;align-items:center;justify-content:space-between;
+    gap:12px;margin-top:20px}
+  .next{flex:1;background:var(--pop);color:#fff;border:2px solid var(--ink);
+    border-radius:14px;padding:13px 18px;font-size:1.05rem;font-weight:800;
+    font-family:inherit;cursor:pointer;box-shadow:3px 3px 0 var(--ink);transition:.1s}
+  .next:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--ink)}
+  .next:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+  .next:focus-visible{outline:3px solid var(--grape);outline-offset:2px}
+  .back{background:none;border:none;color:var(--ink-soft);font-family:inherit;
+    font-size:.9rem;font-weight:600;cursor:pointer;padding:8px}
+  .back:disabled{opacity:.3;cursor:default}
+  .back:focus-visible{outline:2px solid var(--grape);outline-offset:2px;border-radius:6px}
+
+  .count{font-size:.74rem;color:var(--ink-soft);text-align:center;margin-top:10px}
+
+  @media(prefers-reduced-motion:reduce){.card{animation:none}.next{transition:none}
+    .blink{animation:none!important}}
+
+  /* ---- interactive mini-activities (woven between the reading scenes) ---- */
+  .pip.ix{background:var(--line)}
+  .pip.ix.on{background:var(--teal)}
+  .pip.ix.done{background:var(--teal);opacity:.5}
+
+  .ix-stage{position:relative;width:100%;display:flex;align-items:center;
+    justify-content:center;margin-bottom:8px;min-height:200px}
+  .ix-stage svg{overflow:visible}
+
+  .ix-hint{font-size:.88rem;color:var(--ink-soft);text-align:center;
+    margin:0 auto 16px;max-width:40ch}
+
+  .ix-action{display:block;margin:0 auto;background:var(--teal);color:#fff;
+    border:2px solid var(--ink);border-radius:14px;padding:13px 24px;
+    font-size:1.05rem;font-weight:800;font-family:inherit;cursor:pointer;
+    box-shadow:3px 3px 0 var(--ink);transition:.1s}
+  .ix-action:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--ink)}
+  .ix-action:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+  .ix-action:focus-visible{outline:3px solid var(--grape);outline-offset:2px}
+  .ix-action.done{background:var(--pop)}
+  .ix-action:disabled{opacity:.6;cursor:default;transform:none;
+    box-shadow:3px 3px 0 var(--ink)}
+
+  .skip{background:none;border:none;color:var(--ink-soft);font-family:inherit;
+    font-size:.86rem;font-weight:600;cursor:pointer;padding:8px;
+    text-decoration:underline}
+  .skip:focus-visible{outline:2px solid var(--grape);outline-offset:2px;border-radius:6px}
+
+  /* scoop: spheroid rising out of its well */
+  .ix-ball{transform-origin:30px 30px;
+    transition:transform .9s cubic-bezier(.3,1.1,.4,1)}
+  .ix-ball.lifted{transform:translateY(-120px) scale(.62)}
+  .sparkle{opacity:0}
+  .sparkle.show{animation:spk .9s ease-out}
+  @keyframes spk{0%{opacity:0;transform:scale(.4)}40%{opacity:1}100%{opacity:0;transform:scale(1.3)}}
+
+  /* power-on: instrument screen + indicator lights + hum */
+  .scr{fill:#0a0f1c;transition:fill .35s}
+  .scr.on{fill:#0e3b34}
+  .scrtext{opacity:0;transition:opacity .4s .25s}
+  .scrtext.on{opacity:1}
+  .led{fill:#5b4a36;transition:fill .2s}
+  .pwr{cursor:pointer}
+  .machine.on .led{fill:var(--teal)}
+  .machine.on .led1{animation:blink 1.1s steps(1) infinite}
+  .machine.on .led2{animation:blink 1.1s steps(1) .55s infinite}
+  @keyframes blink{0%,49%{opacity:1}50%,100%{opacity:.25}}
+  .wave{opacity:0}
+  .machine.on .wave{opacity:1;animation:hum 1.4s ease-in-out infinite}
+  @keyframes hum{0%,100%{transform:scaleY(.5)}50%{transform:scaleY(1)}}
+
+  /* zap: molecule gets charged and flung */
+  .bolt{opacity:0}
+  .bolt.flash{animation:flash .5s ease-out}
+  @keyframes flash{0%{opacity:0}15%{opacity:1}30%{opacity:.2}45%{opacity:1}100%{opacity:0}}
+  .mol{transition:transform .8s cubic-bezier(.3,1.2,.4,1)}
+  .mol.charged{transform:translateX(150px)}
+  .plus{opacity:0;transition:opacity .3s .15s}
+  .plus.show{opacity:1}
+
+  @media(prefers-reduced-motion:reduce){
+    .ix-ball,.mol{transition:none}
+    .sparkle.show,.bolt.flash,.machine.on .led1,.machine.on .led2,
+    .machine.on .wave{animation:none}
+  }
+
+  /* ---- drag-based activity controls ---- */
+  .ix-controls{margin:0 auto 14px;max-width:300px}
+  .ix-controls:empty{display:none}
+  .gauge{font-family:inherit}
+  .gauge-lab{display:flex;justify-content:space-between;font-size:.74rem;
+    color:var(--ink-soft);margin-bottom:5px;font-weight:600}
+  .gbar{height:13px;border-radius:8px;background:#f0e2c8;
+    border:2px solid var(--ink);overflow:hidden}
+  .gfill{height:100%;width:0;background:var(--teal);border-radius:5px;
+    transition:background .18s}
+  .ix-retry{display:block;margin:0 auto;background:var(--pop);color:#fff;
+    border:2px solid var(--ink);border-radius:13px;padding:11px 20px;
+    font-size:1rem;font-weight:800;font-family:inherit;cursor:pointer;
+    box-shadow:3px 3px 0 var(--ink);transition:.1s}
+  .ix-retry:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--ink)}
+  .ix-retry:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+  .ix-retry:focus-visible{outline:3px solid var(--grape);outline-offset:2px}
+  .nav-right{display:flex;align-items:center;gap:4px}
+  .ix-next{padding:11px 18px;font-size:.98rem}
+  #scoopsvg,#psvg,#zsvg{touch-action:none}
+  #scoopsvg:focus-visible,#psvg:focus-visible,#zsvg:focus-visible{
+    outline:3px solid var(--grape);outline-offset:3px;border-radius:10px}
+
+  /* spheroid shearing into fragments */
+  .frag{}
+  .frags.burst .f1{animation:frag1 .6s ease-out forwards}
+  .frags.burst .f2{animation:frag2 .6s ease-out forwards}
+  .frags.burst .f3{animation:frag3 .6s ease-out forwards}
+  .frags.burst .f4{animation:frag4 .6s ease-out forwards}
+  .frags.burst .f5{animation:frag5 .6s ease-out forwards}
+  @keyframes frag1{from{transform:translate(0,0)}to{transform:translate(-22px,-12px)}}
+  @keyframes frag2{from{transform:translate(0,0)}to{transform:translate(20px,-16px)}}
+  @keyframes frag3{from{transform:translate(0,0)}to{transform:translate(-14px,16px)}}
+  @keyframes frag4{from{transform:translate(0,0)}to{transform:translate(24px,10px)}}
+  @keyframes frag5{from{transform:translate(0,0)}to{transform:translate(4px,22px)}}
+  @media(prefers-reduced-motion:reduce){
+    .frags.burst .frag{animation:none}
+    .f1{transform:translate(-22px,-12px)}.f2{transform:translate(20px,-16px)}
+    .f3{transform:translate(-14px,16px)}.f4{transform:translate(24px,10px)}
+    .f5{transform:translate(4px,22px)}
+  }
+  /* zap: progressive electrification as the HV lever rises */
+  .sparking .spk{animation:spkflick .16s steps(2) infinite}
+  @keyframes spkflick{0%{opacity:1}50%{opacity:.3}100%{opacity:1}}
+  .mol.buzz1{animation:buzz1 .12s steps(2) infinite}
+  .mol.buzz2{animation:buzz2 .08s steps(2) infinite}
+  .mol.buzz3{animation:buzz3 .05s steps(2) infinite}
+  @keyframes buzz1{0%{transform:translate(.6px,0)}100%{transform:translate(-.6px,0)}}
+  @keyframes buzz2{0%{transform:translate(1.3px,.4px)}100%{transform:translate(-1.3px,-.4px)}}
+  @keyframes buzz3{0%{transform:translate(2.2px,.9px)}100%{transform:translate(-2.2px,-.9px)}}
+  @media(prefers-reduced-motion:reduce){
+    .sparking .spk{animation:none}
+    .mol.buzz1,.mol.buzz2,.mol.buzz3{animation:none}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="pips" id="pips"></div>
+  <div id="card"></div>
+  <div class="count" id="count"></div>
+</div>
+
+<script>
+/* ---------------------------------------------------------------------------
+   Larry the Spheroid narrates the whole Yang lab experiment + the MS basics
+   it rests on. One idea per screen. Plain words first, real term in a footnote.
+   The art is one reusable SVG "ball with a face" whose mood changes per scene.
+   --------------------------------------------------------------------------- */
+
+const PALETTE = { pop:"#ff6b4a", pop2:"#ffb13c", teal:"#1fb6a6", grape:"#7c5cbf" };
+
+/* Larry: a round cluster-of-cells character. mood drives eyes + extras. */
+function larry(mood){
+  // base ball = a bumpy cluster (it's a BALL OF CELLS, so give it cell bumps)
+  const bumps = `
+    <circle cx="60" cy="60" r="46" fill="#ff9a7a" stroke="#2a2118" stroke-width="3"/>
+    <circle cx="44" cy="46" r="12" fill="#ffb59c" opacity=".7"/>
+    <circle cx="74" cy="50" r="10" fill="#ffb59c" opacity=".7"/>
+    <circle cx="50" cy="74" r="11" fill="#ffb59c" opacity=".7"/>
+    <circle cx="76" cy="74" r="9"  fill="#ffb59c" opacity=".7"/>`;
+  let eyes, extra = "", mouth;
+  switch(mood){
+    case "curious":
+      eyes = eyePair(52,58,72,58,0,0);
+      mouth = `<path d="M52 80 Q60 86 68 80" stroke="#2a2118" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+      break;
+    case "soaked": // sitting in drug; droplets
+      eyes = eyePair(52,58,72,58,0,1);
+      mouth = `<path d="M52 82 Q60 86 68 82" stroke="#2a2118" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+      extra = `<circle cx="30" cy="30" r="5" fill="#2e7dff" opacity=".8"/>
+               <circle cx="92" cy="36" r="4" fill="#2e7dff" opacity=".8"/>
+               <circle cx="96" cy="80" r="5" fill="#2e7dff" opacity=".8"/>`;
+      break;
+    case "nervous":
+      eyes = eyePair(52,58,72,58,0,2);
+      mouth = `<path d="M52 84 Q60 78 68 84" stroke="#2a2118" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+      extra = `<text x="96" y="34" font-size="18">💧</text>`;
+      break;
+    case "zapped": // charged up for the mass spec — lightning + wild eyes
+      eyes = `<circle cx="52" cy="56" r="9" fill="#fff" stroke="#2a2118" stroke-width="3"/>
+              <circle cx="72" cy="56" r="9" fill="#fff" stroke="#2a2118" stroke-width="3"/>
+              <path d="M48 52 l8 8 M56 52 l-8 8" stroke="#2a2118" stroke-width="2.5"/>
+              <path d="M68 52 l8 8 M76 52 l-8 8" stroke="#2a2118" stroke-width="2.5"/>`;
+      mouth = `<ellipse cx="60" cy="82" rx="7" ry="9" fill="#2a2118"/>`;
+      extra = `<path d="M104 20 l-10 18 l8 0 l-8 16" stroke="${PALETTE.pop2}" stroke-width="4"
+                 fill="none" stroke-linecap="round" stroke-linejoin="round" class="blink"/>
+               <path d="M18 22 l8 16 l-7 1 l7 14" stroke="${PALETTE.pop2}" stroke-width="4"
+                 fill="none" stroke-linecap="round" stroke-linejoin="round" class="blink"/>`;
+      break;
+    case "twin": // Larry + a slightly bigger "decoy" twin
+      return `<svg class="hero" viewBox="0 0 160 120">
+        <g transform="translate(-6 0) scale(.82)">
+          ${bumps}${eyePair(52,58,72,58,0,0)}
+          <path d="M52 80 Q60 86 68 80" stroke="#2a2118" stroke-width="3" fill="none" stroke-linecap="round"/>
+        </g>
+        <g transform="translate(74 6) scale(.82)">
+          <circle cx="60" cy="60" r="46" fill="#9ad6cf" stroke="#2a2118" stroke-width="3"/>
+          <circle cx="44" cy="46" r="12" fill="#bfe6e0" opacity=".7"/>
+          <circle cx="74" cy="50" r="10" fill="#bfe6e0" opacity=".7"/>
+          ${eyePair(52,58,72,58,0,0)}
+          <path d="M52 80 Q60 86 68 80" stroke="#2a2118" stroke-width="3" fill="none" stroke-linecap="round"/>
+          <text x="60" y="118" font-size="13" text-anchor="middle" fill="#0e7d72" font-weight="800">DECOY (+heavier)</text>
+        </g></svg>`;
+    case "fair": // on a balance / being measured
+      eyes = eyePair(52,58,72,58,0,0);
+      mouth = `<path d="M52 80 Q60 85 68 80" stroke="#2a2118" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+      extra = `<path d="M20 104 H100" stroke="#2a2118" stroke-width="3"/>
+               <path d="M60 104 V112" stroke="#2a2118" stroke-width="3"/>
+               <path d="M44 112 H76" stroke="#2a2118" stroke-width="3"/>`;
+      break;
+    case "ghost": // dearly departed Larry: pale, translucent, haloed, serene
+      return `<svg class="hero" viewBox="0 0 120 130">
+        <ellipse cx="60" cy="124" rx="30" ry="5" fill="#2a2118" opacity=".12"/>
+        <ellipse cx="60" cy="26" rx="26" ry="7" fill="none" stroke="${PALETTE.pop2}" stroke-width="3.5"/>
+        <g opacity=".55">
+          <circle cx="60" cy="66" r="46" fill="#ffd9cc" stroke="#2a2118" stroke-width="3"/>
+          <circle cx="44" cy="52" r="12" fill="#fff" opacity=".6"/>
+          <circle cx="74" cy="56" r="10" fill="#fff" opacity=".6"/>
+          <circle cx="50" cy="80" r="11" fill="#fff" opacity=".6"/>
+        </g>
+        <circle cx="52" cy="64" r="8" fill="#fff" stroke="#2a2118" stroke-width="3"/>
+        <circle cx="72" cy="64" r="8" fill="#fff" stroke="#2a2118" stroke-width="3"/>
+        <path d="M48 62 Q52 58 56 62" stroke="#2a2118" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <path d="M68 62 Q72 58 76 62" stroke="#2a2118" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <path d="M52 86 Q60 92 68 86" stroke="#2a2118" stroke-width="3" fill="none" stroke-linecap="round"/>
+      </svg>`;
+    case "hero": // triumphant
+      eyes = eyePair(52,56,72,56,0,0);
+      mouth = `<path d="M50 78 Q60 90 70 78" stroke="#2a2118" stroke-width="3.5" fill="#2a2118"/>`;
+      extra = `<path d="M30 24 l3 8 l8 1 l-6 6 l2 8 l-7 -4 l-7 4 l2 -8 l-6 -6 l8 -1 z" fill="${PALETTE.pop2}"/>
+               <path d="M92 26 l2 6 l6 1 l-5 4 l2 6 l-5 -3 l-5 3 l1 -6 l-4 -4 l6 -1 z" fill="${PALETTE.pop2}"/>`;
+      break;
+    default:
+      eyes = eyePair(52,58,72,58,0,0);
+      mouth = `<path d="M52 80 Q60 86 68 80" stroke="#2a2118" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+  }
+  return `<svg class="hero" viewBox="0 0 120 120">${extra}${bumps}${eyes}${mouth}</svg>`;
+}
+/* eye helper: two eyes, optional pupil offset; style 0 normal,1 happy-ish,2 worried */
+function eyePair(x1,y1,x2,y2,dx,style){
+  const e=(cx,cy)=>{
+    if(style===2) // worried: small + angled brows
+      return `<circle cx="${cx}" cy="${cy}" r="7" fill="#fff" stroke="#2a2118" stroke-width="3"/>
+              <circle cx="${cx}" cy="${cy+1}" r="3" fill="#2a2118"/>`;
+    return `<circle cx="${cx}" cy="${cy}" r="8" fill="#fff" stroke="#2a2118" stroke-width="3"/>
+            <circle cx="${cx+dx}" cy="${cy+1}" r="3.5" fill="#2a2118"/>`;
+  };
+  return e(x1,y1)+e(x2,y2);
+}
+
+/* ---- the script. each scene: mood, kicker, title, body (plain), realword ---- */
+const SCENES = [
+  {
+    mood:"curious",
+    kicker:"Meet your narrator",
+    title:"Hi! I'm a tiny ball of cancer cells.",
+    body:"Scientists grow me in a dish to test cancer drugs. I'm smaller than a poppy seed. Today is a big day for me, and honestly, it does not go great. Tap along and I'll explain the whole thing.",
+    real:"The real name for me is a <b>spheroid</b> — a 3-D clump of tumor cells. Flat dishes of cells are easier, but I behave more like a real tumor."
+  },
+  {
+    mood:"curious",
+    kicker:"The big question",
+    title:"Does the drug actually get inside me?",
+    body:"A cancer drug only works if it reaches the cells <b>inside</b> the ball, not just the surface. So the whole experiment asks one simple thing: how much drug made it in?",
+    real:"This is <b>drug uptake</b>. Tumors that don't let drugs in are why some chemo fails — so measuring this really matters."
+  },
+  {
+    mood:"nervous",
+    kicker:"The problem",
+    title:"There's barely any drug in me to measure.",
+    body:"I'm microscopic. The amount of drug inside me is unbelievably small. You'd need a scale sensitive enough to weigh a single grain among trillions. Good news: that machine exists.",
+    real:"That machine is a <b>mass spectrometer</b>. It can detect amounts as tiny as a trillionth of a gram."
+  },
+  {
+    mood:"zapped",
+    kicker:"What that machine is",
+    title:"A mass spectrometer is a scale for single molecules.",
+    body:"It has one weird rule: it can't weigh a molecule sitting still. So it gives each one a zap of <b>electric charge</b>, flings it through the machine, and sorts them by weight as they fly. Charge it, fling it, sort it. (The zapping is the part I personally object to.)",
+    real:"The zap is <b>ionization</b>. Sorting by weight is really sorting by <b>mass-to-charge ratio</b> — but 'weight' is close enough to picture it."
+  },
+  {
+    mood:"zapped",
+    kicker:"Why weight tells you what something is",
+    title:"Every molecule has its own exact weight.",
+    body:"Like a fingerprint. The drug weighs a specific amount; everything else weighs something else. So if the scale sees that exact weight show up, it knows the drug is there — and how much.",
+    real:"This is using <b>exact mass</b> to identify a molecule. It's why the scale has to be so precise: close isn't good enough."
+  },
+  {
+    mood:"twin",
+    kicker:"The clever trick — the heart of it",
+    title:"Add a decoy twin of the drug.",
+    body:"Here's the brilliant part. They add a known amount of a <b>fake drug</b> — chemically identical, but built a little heavier so the scale can tell the two apart. Real drug on the left, heavier decoy on the right.",
+    real:"The decoy is an <b>internal standard</b> — usually the same drug made with heavier atoms. 'Known amount' is the key: you put in exactly so much."
+  },
+  {
+    mood:"nervous",
+    kicker:"Why the decoy is genius",
+    title:"You always spill some. The decoy spills too.",
+    body:"Moving me around, bits of drug get lost at every step — it's unavoidable. But you lose the <b>same share</b> of real drug and decoy. So their <b>ratio</b> stays the same no matter what you spill. Measure the ratio, and you've got a number you can trust.",
+    real:"This is why results are reported as a <b>drug-to-standard ratio</b>. It cancels out all the messy losses. Skip the decoy and your number is just a guess."
+  },
+  {
+    mood:"fair",
+    kicker:"One more fairness fix",
+    title:"A bigger ball holds more drug. That's not cheating.",
+    body:"If I'm twice the size of my neighbor, of course I soaked up more drug — I'm bigger! To compare fairly, they also measure my <b>size</b> and how many <b>cells</b> I have, then divide. Now it's apples to apples.",
+    real:"This is <b>normalizing</b> to spheroid volume and total protein. It separates 'absorbs drug well' from 'was just bigger.'"
+  },
+  {
+    mood:"hero",
+    kicker:"So what was the point?",
+    title:"Now you can ask the real questions.",
+    body:"Which drug gets into tumors best? Which tumors fight it off? My slightly traumatic day produces a trustworthy number that helps answer exactly that — and that's how this feeds real cancer treatment. Worth it. (For you. Not for me.)",
+    real:"Put together: charge & weigh single molecules, use a decoy to survive spills, and normalize for size. That's the entire Yang-lab method, minus the equations."
+  },
+  {
+    mood:"ghost",
+    kicker:"One honest goodbye",
+    title:"So... what happened to me?",
+    body:"I'll be straight with you: I don't make it. To get the drug out of my cells, they have to <b>burst me open</b> and dissolve me into a soup — that's the only way to free the drug so the machine can weigh it. Measuring me uses me up. But here's the thing: my one measurement helps test real cancer drugs. I'm weirdly okay with the deal.",
+    real:"This is a <b>destructive, endpoint assay</b>: each spheroid gives ONE measurement, then it's gone. The 'bursting open' is <b>lysis</b> (that's the 8 M urea step). It's why you need a whole batch — one sacrificed per timepoint — to see how uptake changes over time."
+  },
+];
+
+const NAME = "Spike";                       // ← change the character's name here
+
+/* ---------------------------------------------------------------------------
+   Interactive interstitials. The 10 reading scenes above are untouched — we
+   just weave three skippable "do something" beats between them. Each beat:
+   a kicker, an instruction, a visual, an action label, a done-line, and a
+   teaching footnote so it still explains itself.
+   --------------------------------------------------------------------------- */
+/* --- shared input: pointer drag that works for both mouse and touch --- */
+function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
+function svgPt(svg,e){
+  const p=svg.createSVGPoint(); p.x=e.clientX; p.y=e.clientY;
+  const m=svg.getScreenCTM(); return m ? p.matrixTransform(m.inverse()) : {x:0,y:0};
+}
+function makeDraggable(handle, svg, h){
+  handle.style.touchAction='none';
+  let on=false;
+  handle.addEventListener('pointerdown',e=>{
+    on=true; try{handle.setPointerCapture(e.pointerId);}catch(_){}
+    h.start && h.start(svgPt(svg,e)); e.preventDefault();
+  });
+  handle.addEventListener('pointermove',e=>{ if(on) h.move && h.move(svgPt(svg,e)); });
+  const end=e=>{ if(!on) return; on=false;
+    try{handle.releasePointerCapture(e.pointerId);}catch(_){}
+    h.end && h.end(svgPt(svg,e)); };
+  handle.addEventListener('pointerup',end);
+  handle.addEventListener('pointercancel',end);
+}
+
+const INTERACTIVES = {
+
+  /* ---- SCOOP: pipette the spheroid out — gently, or it shears apart ---- */
+  scoop:{
+    kicker:"Your turn",
+    title:"Pipette the spheroid out of its well.",
+    hint:"<b>Click and drag</b> the pipette down to the spheroid, then ease it out \u2014 these are <b>incredibly delicate</b>, so creep upward. The slightest yank shears it apart.",
+    done:"Beautifully done \u2014 gentle hands. One intact spheroid, ready to work with.",
+    real:"Spheroids are fragile 3-D balls of cells. Aspirating too fast <b>shears them apart</b>, so you pipette slowly with a wide-bore tip, then transfer to a plate.",
+    svg(){ return `
+      <div class="ix-stage">
+        <svg id="scoopsvg" width="240" height="240" viewBox="0 0 240 240" aria-label="pipetting a spheroid from a well">
+          <path d="M85 112 L85 160 Q85 205 120 205 Q155 205 155 160 L155 112"
+                fill="none" stroke="#2a2118" stroke-width="3"/>
+          <path d="M88 150 L88 160 Q88 202 120 202 Q152 202 152 160 L152 150 Z"
+                fill="#ffd9e0" opacity=".65"/>
+          <ellipse cx="120" cy="112" rx="35" ry="8" fill="none" stroke="#2a2118" stroke-width="3"/>
+          <g id="sph" transform="translate(120 186)">
+            <g id="sphbody">
+              <circle r="17" fill="#ff9a7a" stroke="#2a2118" stroke-width="3"/>
+              <circle cx="-7" cy="-6" r="5" fill="#ffb59c" opacity=".7"/>
+              <circle cx="7"  cy="-4" r="4" fill="#ffb59c" opacity=".7"/>
+              <circle cx="-4" cy="7"  r="4.5" fill="#ffb59c" opacity=".7"/>
+              <circle cx="-5" cy="-2" r="4" fill="#fff" stroke="#2a2118" stroke-width="2"/>
+              <circle cx="5"  cy="-2" r="4" fill="#fff" stroke="#2a2118" stroke-width="2"/>
+              <circle cx="-5" cy="-1" r="1.8" fill="#2a2118"/>
+              <circle cx="5"  cy="-1" r="1.8" fill="#2a2118"/>
+              <path d="M-5 8 Q0 11 5 8" stroke="#2a2118" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+              <g id="cracks" opacity="0" stroke="#7a2a16" stroke-width="1.8" fill="none">
+                <path d="M-13 -3 L-2 2 L-7 11"/>
+                <path d="M12 -8 L3 0 L9 8"/>
+              </g>
+            </g>
+            <g id="frags" opacity="0">
+              <circle class="frag f1" r="6" fill="#ff9a7a" stroke="#2a2118" stroke-width="2.5"/>
+              <circle class="frag f2" r="5" fill="#ff9a7a" stroke="#2a2118" stroke-width="2.5"/>
+              <circle class="frag f3" r="7" fill="#ff9a7a" stroke="#2a2118" stroke-width="2.5"/>
+              <circle class="frag f4" r="4" fill="#ff9a7a" stroke="#2a2118" stroke-width="2.5"/>
+              <circle class="frag f5" r="5" fill="#ff9a7a" stroke="#2a2118" stroke-width="2.5"/>
+            </g>
+          </g>
+          <g id="pip" transform="translate(120 50)">
+            <ellipse cx="0" cy="-98" rx="13" ry="16" fill="#ff6b4a" stroke="#2a2118" stroke-width="3"/>
+            <rect x="-7" y="-84" width="14" height="72" rx="4" fill="#eef3ff" stroke="#2a2118" stroke-width="3"/>
+            <path d="M-7 -12 L0 0 L7 -12 Z" fill="#cfe0ff" stroke="#2a2118" stroke-width="3" stroke-linejoin="round"/>
+          </g>
+        </svg>
+      </div>`; },
+    init(ctx){
+      const svg=document.getElementById('scoopsvg');
+      const pip=document.getElementById('pip');
+      const sph=document.getElementById('sph');
+      const cracks=document.getElementById('cracks');
+      const sphbody=document.getElementById('sphbody');
+      const frags=document.getElementById('frags');
+      ctx.controls.innerHTML=`
+        <div class="gauge">
+          <div class="gauge-lab"><span>Handling force</span><span id="gtext">gentle</span></div>
+          <div class="gbar"><div class="gfill" id="gfill"></div></div>
+        </div>`;
+      const gfill=document.getElementById('gfill');
+      const gtext=document.getElementById('gtext');
+
+      const TOP=50, ATTACH=150, MAXDOWN=168, SPH_REST=186;
+      // Delicate physics — you must CREEP it out. Damage = time spent above the
+      // safe speed, so any quick or jerky motion shears the spheroid.
+      const SAFE=0.11;     // speed (units/ms) below which handling is safe — very low
+      const FULL=0.50;     // speed that reads as 100% on the gauge
+      const DMG=4.5;       // how fast damage builds above SAFE (higher = more fragile)
+      const BREAKAT=100;   // damage to shear it apart
+      let tipY=TOP, attached=false, broken=false, finished=false;
+      let force=0, damage=0, lastY=null, lastT=null, raf=0;
+
+      function place(){
+        pip.setAttribute('transform',`translate(120 ${tipY})`);
+        sph.setAttribute('transform',`translate(120 ${attached?tipY+18:SPH_REST})`);
+      }
+      function setGauge(v){
+        const pct=clamp(v,0,100);
+        gfill.style.width=pct+'%';
+        gfill.style.background = pct>52?'var(--pop)':(pct>22?'var(--pop2)':'var(--teal)');
+        gtext.textContent = pct>52?'too rough!':(pct>22?'careful\u2026':'gentle');
+      }
+      function breakIt(){
+        broken=true; if(raf) cancelAnimationFrame(raf);
+        sphbody.style.transform='none';
+        sphbody.style.transition='opacity .2s'; sphbody.style.opacity='0';
+        frags.setAttribute('opacity','1'); frags.classList.add('burst');
+        setGauge(100);
+        ctx.fail("Oof \u2014 too fast, and the spheroid sheared apart. They're fragile! Try again, nice and slow.");
+      }
+      function succeed(){ finished=true; if(raf) cancelAnimationFrame(raf); setGauge(0); ctx.complete(); }
+
+      // animation loop drives the gauge so it reacts live to how fast you drag
+      function frame(){
+        if(broken||finished||!svg.isConnected){ return; }
+        force*=0.80;                                   // gauge eases back toward "gentle"
+        if(force<0.6) force=0;
+        if(attached){
+          const risk = clamp(damage/BREAKAT,0,1);      // accumulated stress, 0..1
+          // tremble grows with risk so you can SEE it getting dangerous
+          sphbody.style.transform = risk>0.03
+            ? `translateX(${(Math.random()*2-1)*risk*3.4}px)` : 'none';
+          cracks.setAttribute('opacity', String(risk));
+          if(damage>=BREAKAT){ breakIt(); return; }
+        }
+        setGauge(force);
+        raf=requestAnimationFrame(frame);
+      }
+
+      makeDraggable(pip, svg, {
+        start(p){ if(finished||broken) return; lastY=p.y; lastT=performance.now(); },
+        move(p){
+          if(finished||broken) return;
+          const now=performance.now();
+          const y=clamp(p.y, TOP, MAXDOWN);
+          if(lastY!=null){
+            const dt=clamp(now-lastT,1,60);            // ms since last sample
+            const speed=Math.abs(y-lastY)/dt;          // units per ms
+            const inst=clamp(speed/FULL*100,0,100);
+            if(inst>force) force=inst;                 // gauge spikes on any quick move
+            if(attached && speed>SAFE){                // above safe = cumulative harm
+              damage += (speed-SAFE)*dt*DMG;           // time-integrated: faster & longer = worse
+            }
+          }
+          lastY=y; lastT=now; tipY=y;
+          if(!attached && tipY>=ATTACH){ attached=true;
+            ctx.hintHTML("On the tip \u2014 now ease it up <b>very slowly</b>. The slightest yank will tear it."); }
+          place();
+          if(attached && damage>=BREAKAT){ breakIt(); return; }
+          if(attached && tipY<=TOP+3) succeed();
+        },
+        end(){ lastY=null; }
+      });
+
+      // keyboard fallback: Enter performs a gentle auto-extraction
+      svg.setAttribute('tabindex','0');
+      svg.addEventListener('keydown',e=>{
+        if((e.key==='Enter'||e.key===' ') && !finished && !broken){
+          e.preventDefault(); attached=true; ctx.hintHTML("Lifting gently\u2026");
+          const startY=Math.max(tipY,ATTACH), dur=1000; let t0=null; tipY=startY;
+          (function step(ts){ if(broken||finished) return; if(!t0) t0=ts;
+            const k=Math.min((ts-t0)/dur,1); tipY=startY+(TOP-startY)*k; place();
+            if(k<1) requestAnimationFrame(step); else succeed(); })(performance.now());
+        }
+      });
+
+      place(); setGauge(0);
+      raf=requestAnimationFrame(frame);
+    }
+  },
+
+  /* ---- POWER ON: slide the physical toggle switch from OFF to ON ---- */
+  poweron:{
+    kicker:"Your turn",
+    title:"Flip the mass spectrometer on.",
+    hint:"Grab the switch and slide it to <b>ON</b> to boot the instrument.",
+    done:"Online \u2014 detector warmed up and ready.",
+    real:"The real rig is a <b>nanoLC coupled to an Orbitrap</b>: very high resolution and high mass accuracy \u2014 that's what weighs single molecules precisely.",
+    svg(){ return `
+      <div class="ix-stage">
+        <svg id="psvg" class="machine" width="240" height="190" viewBox="0 0 240 190" aria-label="a benchtop mass spectrometer with a power switch">
+          <rect x="28" y="30" width="184" height="120" rx="10" fill="#fffdf8" stroke="#2a2118" stroke-width="3"/>
+          <rect class="scr" id="scr" x="44" y="46" width="98" height="58" rx="5" stroke="#2a2118" stroke-width="3"/>
+          <text class="scrtext" id="scrtext" x="93" y="80" text-anchor="middle"
+                font-family="monospace" font-size="15" font-weight="700" fill="#5fe39b">READY</text>
+          <g class="wave" style="transform-origin:93px 98px">
+            <rect x="60" y="116" width="6" height="10" fill="${PALETTE.teal}"/>
+            <rect x="72" y="112" width="6" height="14" fill="${PALETTE.teal}"/>
+            <rect x="84" y="108" width="6" height="18" fill="${PALETTE.teal}"/>
+            <rect x="96" y="112" width="6" height="14" fill="${PALETTE.teal}"/>
+            <rect x="108" y="116" width="6" height="10" fill="${PALETTE.teal}"/>
+          </g>
+          <circle class="led led1" cx="170" cy="52" r="6" stroke="#2a2118" stroke-width="2"/>
+          <circle class="led led2" cx="170" cy="72" r="6" stroke="#2a2118" stroke-width="2"/>
+          <text x="158" y="100" font-size="9" fill="#6b5d49" font-family="monospace">OFF</text>
+          <text x="182" y="100" font-size="9" fill="#6b5d49" font-family="monospace">ON</text>
+          <rect x="154" y="108" width="40" height="26" rx="13" fill="#3a3026"/>
+          <circle id="knob" cx="167" cy="121" r="14" fill="#e7ebf3" stroke="#2a2118" stroke-width="3" style="cursor:grab"/>
+          <rect x="50" y="150" width="18" height="9" fill="#2a2118"/>
+          <rect x="172" y="150" width="18" height="9" fill="#2a2118"/>
+        </svg>
+      </div>`; },
+    init(ctx){
+      const svg=document.getElementById('psvg');
+      const knob=document.getElementById('knob');
+      const offX=167, onX=181;
+      let finished=false, moved=false, kx=offX;
+      function setKnob(x){ kx=clamp(x,offX,onX); knob.setAttribute('cx',kx); }
+      function powerOn(){
+        if(finished) return; finished=true; setKnob(onX);
+        svg.classList.add('on');
+        document.getElementById('scr').classList.add('on');
+        document.getElementById('scrtext').classList.add('on');
+        ctx.complete();
+      }
+      makeDraggable(knob, svg, {
+        start(){ moved=false; },
+        move(p){ if(finished) return; moved=true; setKnob(p.x); },
+        end(){ if(finished) return;
+          if(!moved){ powerOn(); return; }
+          if(kx > (offX+onX)/2) powerOn(); else setKnob(offX); }
+      });
+      svg.setAttribute('tabindex','0');
+      svg.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); powerOn(); }});
+    }
+  },
+
+  /* ---- ZAP: drag the high-voltage lever up to fire the ion source ---- */
+  zap:{
+    kicker:"Your turn",
+    title:"Charge a molecule to launch it.",
+    hint:"Slide the high-voltage lever up \u2014 watch it electrify \u2014 then take it to the top to fire.",
+    done:"Charged! The ion gets flung through the analyzer to be weighed.",
+    real:"That's <b>ionization</b> (electrospray). A charged molecule can be sorted by its <b>mass-to-charge ratio</b> \u2014 the whole basis of how MS works.",
+    svg(){ return `
+      <div class="ix-stage">
+        <svg id="zsvg" width="240" height="180" viewBox="0 0 240 180" aria-label="charging and launching a molecule">
+          <rect x="14" y="34" width="168" height="96" rx="10" fill="#fffdf8" stroke="#2a2118" stroke-width="3"/>
+          <text x="98" y="150" text-anchor="middle" font-size="11" fill="#6b5d49" font-family="monospace">ionization chamber</text>
+          <g class="bolt" id="bolt" stroke="${PALETTE.pop2}" stroke-width="5" fill="none"
+             stroke-linecap="round" stroke-linejoin="round">
+            <path d="M60 12 l-12 26 10 0 -10 22"/>
+            <path d="M130 10 l12 26 -10 0 10 22"/>
+          </g>
+          <g transform="translate(64 84)">
+            <circle id="zglow" cx="0" cy="0" r="24" fill="${PALETTE.pop2}" opacity="0"/>
+            <g id="zsparks" opacity="0" stroke="${PALETTE.pop2}" stroke-width="2.4" fill="none"
+               stroke-linecap="round" stroke-linejoin="round">
+              <path class="spk" d="M0 -32 l-5 8 6 2 -5 9"/>
+              <path class="spk" d="M32 -6 l-9 3 4 5 -9 4"/>
+              <path class="spk" d="M-32 -2 l9 3 -4 5 9 3"/>
+              <path class="spk" d="M0 32 l-5 -8 6 -2 -5 -9"/>
+              <path class="spk" d="M24 24 l-8 -3 1 5 -8 1"/>
+              <path class="spk" d="M-24 22 l8 -3 -1 5 8 1"/>
+            </g>
+            <g class="mol" id="mol">
+              <circle cx="0" cy="0" r="24" fill="#cfc6b8" stroke="#2a2118" stroke-width="3"/>
+              <circle cx="-8" cy="-3" r="5" fill="#fff" stroke="#2a2118" stroke-width="2.5"/>
+              <circle cx="8" cy="-3" r="5" fill="#fff" stroke="#2a2118" stroke-width="2.5"/>
+              <circle cx="-8" cy="-2" r="2" fill="#2a2118"/>
+              <circle cx="8" cy="-2" r="2" fill="#2a2118"/>
+              <path d="M-7 10 Q0 15 7 10" stroke="#2a2118" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+              <g class="plus" id="plus">
+                <circle cx="20" cy="-19" r="10" fill="${PALETTE.pop}" stroke="#2a2118" stroke-width="2.5"/>
+                <line x1="20" y1="-24" x2="20" y2="-14" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+                <line x1="15" y1="-19" x2="25" y2="-19" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+              </g>
+            </g>
+          </g>
+          <text x="212" y="30" text-anchor="middle" font-size="9" fill="#6b5d49" font-family="monospace">HV</text>
+          <rect x="205" y="40" width="14" height="104" rx="7" fill="#e8d3b0" stroke="#2a2118" stroke-width="2"/>
+          <rect id="hvfill" x="205" y="144" width="14" height="0" rx="7" fill="${PALETTE.pop2}"/>
+          <circle id="lever" cx="212" cy="138" r="14" fill="#e7ebf3" stroke="#2a2118" stroke-width="3" style="cursor:grab"/>
+          <text id="zkv" x="212" y="162" text-anchor="middle" font-size="9" fill="#6b5d49" font-family="monospace" font-weight="700">0.0 kV</text>
+        </svg>
+      </div>`; },
+    init(ctx){
+      const svg=document.getElementById('zsvg');
+      const lever=document.getElementById('lever');
+      const fill=document.getElementById('hvfill');
+      const glow=document.getElementById('zglow');
+      const sparks=document.getElementById('zsparks');
+      const mol=document.getElementById('mol');
+      const kv=document.getElementById('zkv');
+      const TOP=46, BOT=138; let ly=BOT, fired=false, moved=false;
+
+      function electrify(t){                            // t = 0 (off) .. 1 (max charge)
+        glow.setAttribute('opacity', (t*0.7).toFixed(2));
+        glow.setAttribute('r', (22+t*16).toFixed(1));
+        sparks.style.opacity = t.toFixed(2);
+        sparks.classList.toggle('sparking', t>0.05);
+        kv.textContent = (t*5).toFixed(1)+' kV';
+        kv.setAttribute('fill', t>0.82 ? PALETTE.pop : '#6b5d49');
+        mol.classList.toggle('buzz1', t>0.12 && t<=0.5);
+        mol.classList.toggle('buzz2', t>0.5 && t<=0.82);
+        mol.classList.toggle('buzz3', t>0.82);
+      }
+      function setLever(y){
+        ly=clamp(y,TOP,BOT); lever.setAttribute('cy',ly);
+        fill.setAttribute('y',ly); fill.setAttribute('height',BOT-ly);
+        electrify((BOT-ly)/(BOT-TOP));
+      }
+      function fire(){
+        if(fired) return; fired=true; setLever(TOP);
+        document.getElementById('bolt').classList.add('flash');
+        setTimeout(()=>{
+          sparks.style.opacity='0'; sparks.classList.remove('sparking');
+          glow.setAttribute('opacity','0');
+          mol.classList.remove('buzz1','buzz2','buzz3');
+          document.getElementById('plus').classList.add('show');
+          mol.classList.add('charged');
+        },300);
+        ctx.complete();
+      }
+      makeDraggable(lever, svg, {
+        start(){ moved=false; },
+        move(p){ if(fired) return; moved=true; setLever(p.y); if(ly<=TOP+4) fire(); },
+        end(){ if(fired) return; if(!moved){ fire(); return; } setLever(BOT); }
+      });
+      svg.setAttribute('tabindex','0');
+      svg.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); fire(); }});
+      setLever(BOT);
+    }
+  },
+
+};
+
+
+/* The full ordered flow: 10 reading scenes + 3 interactive beats between them. */
+const SEQUENCE = [
+  {type:'scene', idx:0},          // meet Larry
+  {type:'ix',    id:'scoop'},     // ▶ scoop the spheroid out of its well
+  {type:'scene', idx:1},          // the big question
+  {type:'scene', idx:2},          // barely any drug to measure
+  {type:'ix',    id:'poweron'},   // ▶ power on the mass spectrometer
+  {type:'scene', idx:3},          // what the machine is (the zap)
+  {type:'ix',    id:'zap'},       // ▶ zap a molecule
+  {type:'scene', idx:4},          // every molecule has an exact weight
+  {type:'scene', idx:5},          // the decoy twin
+  {type:'scene', idx:6},          // you always spill some
+  {type:'scene', idx:7},          // one more fairness fix
+  {type:'scene', idx:8},          // the point
+  {type:'scene', idx:9},          // honest goodbye
+];
+
+let pos = 0;
+const cardEl = document.getElementById('card');
+const pipsEl = document.getElementById('pips');
+const countEl = document.getElementById('count');
+
+function drawPipsAndCount(){
+  pipsEl.innerHTML = SEQUENCE.map((step,k)=>{
+    const ix = step.type==='ix' ? ' ix' : '';
+    const stt = k===pos ? ' on' : (k<pos ? ' done' : '');
+    return `<div class="pip${ix}${stt}"></div>`;
+  }).join('');
+  countEl.textContent = `${pos+1} of ${SEQUENCE.length}`;
+}
+
+function goTo(p){
+  pos = (p < 0) ? 0 : (p >= SEQUENCE.length ? 0 : p);
+  render(); window.scrollTo(0,0);
+}
+
+function render(){
+  const step = SEQUENCE[pos];
+  if(step.type==='scene') renderScene(step.idx);
+  else renderInteractive(step.id);
+  drawPipsAndCount();
+}
+
+/* ---- the original reading card — unchanged in look & content ---- */
+function renderScene(idx){
+  const s = SCENES[idx];
+  const last = pos === SEQUENCE.length-1;
+  const ghost = s.mood === "ghost";
+  const tag = `
+    <div class="nametag">
+      <div class="hello">${ghost ? '<small>here lies</small>in memoriam' : '<small>hello</small>my name is'}</div>
+      <div class="name">${NAME}</div>
+    </div>`;
+  cardEl.innerHTML = `
+    <div class="card">
+      <div class="stage">${larry(s.mood)}${tag}</div>
+      <p class="kicker">${s.kicker}</p>
+      <h2>${s.title}</h2>
+      <p class="body">${s.body}</p>
+      <div class="realword">🔬 ${s.real}</div>
+      <div class="nav">
+        <button class="back" id="back" ${pos===0?'disabled':''}>← Back</button>
+        <button class="next" id="next">${last?'Start over ↺':(pos===0?"Let's go →":'Next →')}</button>
+      </div>
+    </div>`;
+  document.getElementById('next').onclick = ()=>goTo(last?0:pos+1);
+  document.getElementById('back').onclick = ()=>{ if(pos>0) goTo(pos-1); };
+}
+
+/* ---- an interactive beat: do it (or skip) to continue ---- */
+function renderInteractive(id){
+  const a = INTERACTIVES[id];
+  cardEl.innerHTML = `
+    <div class="card">
+      ${a.svg()}
+      <p class="kicker">${a.kicker}</p>
+      <h2>${a.title}</h2>
+      <p class="ix-hint" id="ixhint">${a.hint}</p>
+      <div class="ix-controls" id="ixcontrols"></div>
+      <div class="realword">\ud83d\udd2c ${a.real}</div>
+      <div class="nav">
+        <button class="back" id="back" ${pos===0?'disabled':''}>\u2190 Back</button>
+        <div class="nav-right">
+          <button class="next ix-next" id="ixnext" hidden>Next \u2192</button>
+          <button class="skip" id="skip">Skip \u2192</button>
+        </div>
+      </div>
+    </div>`;
+  const hintEl=document.getElementById('ixhint');
+  const ctx={
+    controls: document.getElementById('ixcontrols'),
+    hint:(t)=>{ hintEl.textContent=t; },
+    hintHTML:(t)=>{ hintEl.innerHTML=t; },
+    complete:(msg)=>{ hintEl.innerHTML = msg||a.done;
+      document.getElementById('ixnext').hidden=false; },
+    fail:(msg)=>{ hintEl.textContent = msg||"Try again.";
+      ctx.controls.innerHTML = `<button class="ix-retry" id="ixretry">\u21ba Try again</button>`;
+      document.getElementById('ixretry').onclick=()=>renderInteractive(id); }
+  };
+  a.init(ctx);
+  document.getElementById('ixnext').onclick = ()=>goTo(pos+1);
+  document.getElementById('skip').onclick   = ()=>goTo(pos+1);
+  document.getElementById('back').onclick   = ()=>{ if(pos>0) goTo(pos-1); };
+}
+
+/* keyboard: → / space = forward (acts as Skip on an activity), ← = back */
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key===' '){ e.preventDefault(); goTo(pos+1); }
+  if(e.key==='ArrowLeft'){ if(pos>0) goTo(pos-1); }
+});
+
+render();
+</script>
+</body>
+</html>
